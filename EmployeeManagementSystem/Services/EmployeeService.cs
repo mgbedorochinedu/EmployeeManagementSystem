@@ -27,11 +27,11 @@ namespace EmployeeManagementSystem.Services
         }
 
         //Create ID for the authenticated User method
-        private int GetUserId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+        //private int GetUserId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
 
 
         //Create authenticated User Role method
-        private string GetUserRole() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
+        //private string GetUserRole() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
 
 
         //Add Employee method
@@ -43,7 +43,7 @@ namespace EmployeeManagementSystem.Services
             await _context.Employees.AddAsync(employee);
             await _context.SaveChangesAsync();
 
-            serviceResponse.Data = (_context.Employees.Where(e => e.User.Id == GetUserId()).Select(e => _mapper.Map<GetEmployeeVM>(e))).ToList();
+            serviceResponse.Data = (_context.Employees.Select(e => _mapper.Map<GetEmployeeVM>(e))).ToList(); //Where(e => e.User.Id == GetUserId())
 
             return serviceResponse;
 
@@ -56,13 +56,13 @@ namespace EmployeeManagementSystem.Services
             ServiceResponse<List<GetEmployeeVM>> serviceResponse = new ServiceResponse<List<GetEmployeeVM>>();
             try
             {
-                Employee employee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeId == id && e.User.Id == GetUserId());
+                Employee employee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeId == id); //&& e.User.Id == GetUserId()
 
                 if (employee != null)
                 {
                     _context.Employees.Remove(employee);
                     await _context.SaveChangesAsync();
-                    serviceResponse.Data = (_context.Employees.Where(c => c.User.Id == GetUserId()).Select(c => _mapper.Map<GetEmployeeVM>(c))).ToList();
+                    serviceResponse.Data = (_context.Employees.Select(c => _mapper.Map<GetEmployeeVM>(c))).ToList(); //.Where(c => c.User.Id == GetUserId())
                 }
                 else
                 {
@@ -84,10 +84,10 @@ namespace EmployeeManagementSystem.Services
         {
             ServiceResponse<List<GetEmployeeVM>> serviceResponse = new ServiceResponse<List<GetEmployeeVM>>();
             List<Employee> dbEmployees =
-            GetUserRole().Equals("Admin") ?
-            await _context.Employees.ToListAsync() :
+            //GetUserRole().Equals("Admin") ?
+            await _context.Employees.ToListAsync();
             await _context.Employees
-            .Where(c => c.User.Id == GetUserId()).ToListAsync();
+            .ToListAsync(); //.Where(c => c.User.Id == GetUserId())
 
             serviceResponse.Data = (dbEmployees.Select(c => _mapper.Map<GetEmployeeVM>(c))).ToList();
             return serviceResponse;
@@ -97,7 +97,8 @@ namespace EmployeeManagementSystem.Services
         {
             ServiceResponse<GetEmployeeVM> serviceResponse = new ServiceResponse<GetEmployeeVM>();
             Employee dbEmployee = await _context.Employees
-            .FirstOrDefaultAsync(c => c.EmployeeId == id && c.User.Id == GetUserId());
+            .FirstOrDefaultAsync(c => c.EmployeeId == id); //&& c.User.Id == GetUserId()
+
 
             serviceResponse.Data = _mapper.Map<GetEmployeeVM>(dbEmployee);
             return serviceResponse;
@@ -109,8 +110,8 @@ namespace EmployeeManagementSystem.Services
             ServiceResponse<GetEmployeeVM> serviceResponse = new ServiceResponse<GetEmployeeVM>();
             try
             {
-                Employee employee = await _context.Employees.Include(c => c.User).FirstOrDefaultAsync(e => e.EmployeeId == updatedEmployee.EmployeeId);
-                if (employee.User.Id == GetUserId())
+                Employee employee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeId == updatedEmployee.EmployeeId); //.Include(c => c.User)
+                if (employee != null) //User.Id == GetUserId()
                 {
                     employee.FirstName = updatedEmployee.FirstName;
                     employee.LastName = updatedEmployee.LastName;

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace EmployeeManagementSystem.Controllers
 {
-    [Authorize]
+  //  [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeeController : ControllerBase

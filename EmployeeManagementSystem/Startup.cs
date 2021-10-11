@@ -36,7 +36,7 @@ namespace EmployeeManagementSystem
         {
             services.AddDbContext<AppDataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            //services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("SqliteConnection")));
+            //services.AddDbContext<AppDataContext>(x => x.UseSqlite(Configuration.GetConnectionString("SqliteConnection")));
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
